@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adaptive Takeover Request Simulator</title>
+<style>
+:root { --bg: #f4f5f7; --ink: #1d2330; --muted: #5d6677; --line: #d6dae2; --accent: #2457c5; --warn: #d97706; --danger: #c62828; --ok: #2e7d32; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); }
+header { padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+header h1 { font-size: 18px; margin: 0; }
+header span { color: var(--muted); font-size: 13px; }
+main { display: flex; gap: 14px; padding: 14px; align-items: flex-start; flex-wrap: wrap; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+.tag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 6px; margin-left: 6px; vertical-align: middle; letter-spacing: .03em; }
+.tag.sim { background: #fff3e0; color: #b45309; border: 1px solid #f5c58a; }
+.tag.impl { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+#roadWrap { position: relative; }
+canvas { display: block; border-radius: 10px; background: #3a3f47; }
+#tor { position: absolute; left: 10px; right: 10px; top: 10px; padding: 10px; border-radius: 8px; color: #fff; font-weight: 700; display: none; text-align: center; }
+#tor.stage1 { background: rgba(217, 119, 6, .95); }
+#tor.stage2 { background: rgba(198, 40, 40, .97); }
+#tor .big { font-size: 17px; white-space: nowrap; }
+#toast { position: absolute; left: 50%; top: 45%; transform: translateX(-50%); color: #fff; font-weight: 700; padding: 10px 16px; border-radius: 8px; display: none; white-space: nowrap; }
+#tor .mods { font-size: 13px; font-weight: 600; margin-top: 4px; }
+#status { position: absolute; left: 10px; bottom: 10px; right: 10px; background: rgba(0, 0, 0, .65); color: #fff; font-size: 13px; padding: 6px 8px; border-radius: 6px; }
+.shake { animation: shake .12s linear infinite; }
+@keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } 100% { transform: translateX(0); } }
+.btnrow { display: flex; gap: 6px; flex-wrap: wrap; }
+button { font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 7px; border: 1px solid var(--line); background: #fff; cursor: pointer; }
+button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
+button:disabled { opacity: .45; cursor: default; }
+label.chk { font-size: 13px; display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+#screen { height: 120px; border-radius: 8px; background: #111; color: #eee; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; padding: 10px; position: relative; overflow: hidden; }
+#screen.paused { background: #3b1010; }
+#seat { font-size: 13px; padding: 8px; border-radius: 8px; border: 1px dashed var(--line); text-align: center; }
+#seat.buzz { border-color: var(--danger); color: var(--danger); font-weight: 700; }
+.kv { font-size: 13px; display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; }
+.kv b { color: var(--muted); font-weight: 600; }
+table { border-collapse: collapse; font-size: 12px; width: 100%; }
+th, td { border-bottom: 1px solid var(--line); padding: 4px 5px; text-align: left; white-space: nowrap; }
+th { color: var(--muted); font-weight: 600; }
+.good { color: var(--ok); font-weight: 600; }
+.bad { color: var(--danger); font-weight: 600; }
+.help { font-size: 12px; color: var(--muted); line-height: 1.45; }
+kbd { border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; font-size: 11px; background: #fafafa; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Adaptive Takeover Request Simulator</h1>
+  <span>SAE Level 3 motorway prototype · rule-based readiness inference · not a validated driving simulator</span>
+</header>
+<main>
+  <div class="col">
+    <div id="roadWrap">
+      <canvas id="road" width="360" height="600"></canvas>
+      <div id="tor"><div class="big" id="torText">TAKE OVER</div><div class="mods" id="torMods"></div></div>
+      <div id="toast"></div>
+      <div id="status">Automation ON — car is driving.</div>
+    </div>
+  </div>
+
+  <div class="col" style="width: 330px;">
+    <div class="card">
+      <h2>1. Request mode <span class="tag impl">IMPLEMENTED</span></h2>
+      <div class="btnrow">
+        <button id="modeFixed">Fixed (baseline)</button>
+        <button id="modeAdaptive" class="on">Adaptive</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>2. Driver activity <span class="tag sim">SIMULATED SENSOR</span></h2>
+      <div class="btnrow">
+        <button data-act="road">Eyes on road</button>
+        <button data-act="reading">Reading</button>
+        <button data-act="film" class="on">Watching film</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="fault"> Sensor error: reports "eyes on road" whatever the driver is doing</label>
+      <p class="help">Stands in for a planned driver-monitoring camera. The buttons set what the driver is actually doing; the planner only sees the sensor reading.</p>
+    </div>
+    <div class="card">
+      <h2>3. Trigger a takeover <span class="tag impl">IMPLEMENTED</span></h2>
+      <div class="btnrow">
+        <button id="urgent" class="primary">Urgent: roadworks</button>
+        <button id="nonurgent" class="primary">Non-urgent: exit</button>
+      </div>
+      <label class="chk"><input type="checkbox" id="sound" checked> Sound</label>
+      <p class="help">Take over: <kbd>Space</kbd> (hands on wheel) or any arrow key. Steer with <kbd>←</kbd> <kbd>→</kbd>. Roadworks block the middle lane; for the exit, reach the left lane.</p>
+    </div>
+  </div>
+
+  <div class="col" style="width: 300px;">
+    <div class="card">
+      <h2>In-car screen <span class="tag sim">SIMULATED</span></h2>
+      <div id="screen">▶ Film playing</div>
+    </div>
+    <div class="card">
+      <h2>Seat vibration <span class="tag sim">SIMULATED HAPTIC</span></h2>
+      <div id="seat">Seat motors idle</div>
+    </div>
+    <div class="card">
+      <h2>Planner reasoning <span class="tag impl">IMPLEMENTED</span></h2>
+      <div class="kv" id="reasoning"></div>
+    </div>
+  </div>
+
+  <div class="card" style="flex: 1 1 100%; overflow-x: auto;">
+    <h2>Takeover log <span class="tag impl">IMPLEMENTED</span> <button id="csv" style="float: right;">Download CSV</button></h2>
+    <table>
+      <thead><tr><th>#</th><th>Mode</th><th>Scenario</th><th>Actual activity</th><th>Sensor said</th><th>Lead time</th><th>Modalities</th><th>Escalated</th><th>Takeover time</th><th>Lane deviation (RMS, 2–10 s)</th><th>Outcome</th></tr></thead>
+      <tbody id="log"><tr><td colspan="11" class="help">No takeovers yet.</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+// ---------- Configuration (all timings in seconds) ----------
+// Fixed baseline: one time budget and modality for every driver.
+const FIXED = { lead: 7, mods: ["visual", "chime"], escalateAfter: 4 };
+
+// Adaptive plan by estimated readiness (driver activity reported by the sensor).
+// Based on Gold et al. 2013 (time budget), Politis et al. 2015 and Zhang et al. 2019
+// (multimodal/auditory/vibrotactile), Wickens 2002 (multiple resources),
+// Wintersberger et al. 2018 (interrupting the secondary task).
+const ADAPTIVE = {
+  road: { readiness: "High", lead: 5, mods: ["visual", "chime"], pauseScreen: false },
+  reading: { readiness: "Medium", lead: 7, mods: ["visual", "voice", "haptic"], pauseScreen: true },
+  film: { readiness: "Low", lead: 8, mods: ["visual", "voice", "haptic"], pauseScreen: true }
+};
+const ADAPTIVE_ESCALATE_AFTER = 2; // seconds with no hands-on response before escalating
+const NONURGENT_FACTOR = 2; // non-urgent requests give twice the time and start gently
+const SLOW_RESPONSE = 3; // personal adjustment: driver counted as slow above this takeover time
+const MEASURE_FROM = 2, MEASURE_TO = 10; // lane-keeping window after takeover
+
+// ---------- Geometry ----------
+const cv = document.getElementById("road");
+const ctx = cv.getContext("2d");
+const ROAD_L = 60, LANE_W = 80, LANES = 3;
+const laneCentre = i => ROAD_L + LANE_W * i + LANE_W / 2;
+const EGO_Y = 500, SPEED = 60; // px per second
+const PX_PER_M = LANE_W / 3.6; // one lane = 3.6 m (UK motorway lane width)
+
+// ---------- State ----------
+const state = {
+  mode: "adaptive", activity: "film", fault: false,
+  phase: "auto", // auto | request | manual | mrm | done
+  t: 0, scroll: 0,
+  x: laneCentre(1), vx: 0, speed: 1,
+  hazard: null, // { y, type }
+  req: null, // current request record
+  keys: {},
+  history: [], // previous takeover times (personal adjustment)
+  log: []
+};
+
+const $ = id => document.getElementById(id);
+
+// ---------- Audio (Web Audio, no files) ----------
+let audio = null;
+function tone(freq, dur, when = 0, vol = 0.2) {
+  if (!$("sound").checked) return;
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.frequency.value = freq; o.type = "sine";
+  g.gain.value = vol;
+  o.connect(g); g.connect(audio.destination);
+  const t0 = audio.currentTime + when;
+  o.start(t0); o.stop(t0 + dur);
+}
+const chime = () => { tone(660, 0.18); tone(880, 0.25, 0.2); };
+// Spoken prompt (Web Speech API); falls back to a tone pattern if speech is unavailable.
+function speak(text) {
+  if (!$("sound").checked) return;
+  if ("speechSynthesis" in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.05; u.lang = "en-GB";
+    speechSynthesis.speak(u);
+  } else { tone(520, 0.12); tone(520, 0.12, 0.18); tone(780, 0.3, 0.36); }
+}
+const voiceCue = (urgent, lead) => { tone(660, 0.15); speak(urgent ? `Please take over. Middle lane closed in ${Math.round(lead)} seconds. Move left or right.` : `Please take over when ready. Exit on the left in ${Math.round(lead)} seconds.`); };
+const alarm = () => { for (let i = 0; i < 4; i++) tone(1000, 0.1, i * 0.15, 0.3); };
+
+// ---------- Planner (the "intelligent" part) ----------
+function sensedActivity() {
+  return state.fault ? "road" : state.activity;
+}
+
+function personalAdjustment() {
+  // Repeated takeovers: if this driver's last two takeovers were slow, warn 1 s earlier (max +2 s).
+  const recent = state.history.slice(-2);
+  if (recent.length < 2) return 0;
+  const slow = recent.filter(t => t > SLOW_RESPONSE).length;
+  return Math.min(2, slow);
+}
+
+function planRequest(urgent) {
+  const sensed = sensedActivity();
+  if (state.mode === "fixed") {
+    const lead = urgent ? FIXED.lead : FIXED.lead * NONURGENT_FACTOR;
+    return { sensed, readiness: "not estimated", lead, mods: FIXED.mods.slice(), pauseScreen: false,
+      escalateAfter: urgent ? FIXED.escalateAfter : FIXED.escalateAfter * NONURGENT_FACTOR,
+      adjust: 0, why: "Same request for every driver." };
+  }
+  const p = ADAPTIVE[sensed];
+  const adjust = personalAdjustment();
+  let lead = p.lead + adjust;
+  let mods = p.mods.slice();
+  let why = `Sensor says "${label(sensed)}" → readiness ${p.readiness}.`;
+  if (!urgent) {
+    lead = lead * NONURGENT_FACTOR;
+    // Gentle first stage for non-urgent requests to avoid needless alarms (cry-wolf, Breznitz 1984).
+    if (sensed !== "film") mods = ["visual", "chime"];
+    why += " Non-urgent: more time, gentler first cue.";
+  }
+  if (adjust) why += ` Personal adjustment +${adjust}s (recent slow takeovers).`;
+  const escalateAfter = urgent ? ADAPTIVE_ESCALATE_AFTER : ADAPTIVE_ESCALATE_AFTER * NONURGENT_FACTOR;
+  return { sensed, readiness: p.readiness, lead, mods, pauseScreen: p.pauseScreen, escalateAfter, adjust, why };
+}
+
+function label(a) { return { road: "eyes on road", reading: "reading", film: "watching film" }[a]; }
+
+// ---------- Request lifecycle ----------
+function startRequest(urgent) {
+  if (state.phase !== "auto") return;
+  const plan = planRequest(urgent);
+  state.req = { ...plan, urgent, start: state.t, escalated: false, takeoverAt: null, samples: [],
+    actual: state.activity, mode: state.mode, outcome: null };
+  // Hazard sits 3 s beyond the request deadline, leaving room for a minimal-risk stop if nobody responds.
+  state.hazard = { y: EGO_Y - SPEED * (plan.lead + 3) - 30, type: urgent ? "cones" : "exit" };
+  state.phase = "request";
+  presentStage1();
+  renderReasoning();
+}
+
+function presentStage1() {
+  const r = state.req;
+  const tor = $("tor");
+  tor.className = "stage1"; tor.style.display = "block";
+  $("torMods").textContent = modsText(r.mods);
+  if (r.mods.includes("voice")) voiceCue(r.urgent, r.lead); else chime();
+  if (r.mods.includes("haptic")) buzz(true);
+  if (r.pauseScreen) pauseScreen("Paused — please take over");
+}
+
+function escalate() {
+  const r = state.req;
+  r.escalated = true;
+  r.mods = Array.from(new Set([...r.mods, "voice", "haptic", "alarm"]));
+  $("tor").className = "stage2";
+  $("torMods").textContent = modsText(r.mods);
+  alarm(); buzz(true);
+  speak("Take over now.");
+  pauseScreen("Paused — take over NOW");
+  renderReasoning();
+}
+
+function modsText(m) {
+  const names = { visual: "👁 visual", chime: "🔔 chime", voice: "🗣 spoken prompt", haptic: "📳 seat vibration", alarm: "🚨 alarm" };
+  return m.map(x => names[x]).join(" · ");
+}
+
+function buzz(on) {
+  $("seat").className = on ? "buzz shake" : "";
+  $("seat").textContent = on ? "Seat vibrating" : "Seat motors idle";
+  if (on && navigator.vibrate) navigator.vibrate(300);
+}
+
+function toast(text, colour) {
+  const t = $("toast");
+  t.textContent = text; t.style.background = colour; t.style.display = "block";
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { t.style.display = "none"; }, 2200);
+}
+
+function pauseScreen(msg) { $("screen").className = "paused"; $("screen").textContent = "⏸ " + msg; }
+function resetScreen() {
+  $("screen").className = "";
+  $("screen").textContent = { road: "Screen idle (driver watching road)", reading: "📖 E-book open", film: "▶ Film playing" }[state.activity];
+}
+
+function takeover() {
+  if (state.phase !== "request") return;
+  const r = state.req;
+  r.takeoverAt = state.t;
+  state.phase = "manual";
+  state.history.push(r.takeoverAt - r.start);
+  $("tor").style.display = "none";
+  buzz(false);
+  $("screen").className = ""; $("screen").textContent = "Screen locked while driving manually";
+  toast("✓ You have control", "#2e7d32");
+  tone(880, 0.12); tone(660, 0.18, 0.14);
+  state.vx = (Math.random() < 0.5 ? -1 : 1) * 25; // small disturbance at handover (Merat et al. 2014)
+}
+
+function minimalRiskStop() {
+  state.phase = "mrm";
+  const r = state.req;
+  r.outcome = "No takeover → minimal-risk stop (simulated)";
+  $("tor").style.display = "none"; buzz(false);
+}
+
+function finishEpisode() {
+  const r = state.req;
+  const s = r.samples;
+  r.rms = s.length ? Math.sqrt(s.reduce((a, d) => a + d * d, 0) / s.length) : null;
+  state.log.push(r);
+  state.phase = "done";
+  renderLog(); renderReasoning();
+  setTimeout(resetDrive, 2500);
+}
+
+function resetDrive() {
+  toast("Automation resumed", "#2457c5");
+  state.phase = "auto"; state.hazard = null; state.req = null;
+  state.x = laneCentre(1); state.vx = 0; state.speed = 1;
+  resetScreen(); renderReasoning();
+}
+
+// ---------- Simulation loop ----------
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000);
+  last = now;
+  step(dt);
+  draw();
+  requestAnimationFrame(frame);
+}
+
+function step(dt) {
+  state.t += dt;
+  state.scroll = (state.scroll + SPEED * state.speed * dt) % 40;
+  const r = state.req;
+  if (state.hazard) state.hazard.y += SPEED * state.speed * dt;
+
+  if (state.phase === "request") {
+    const elapsed = state.t - r.start;
+    const left = Math.max(0, r.lead - elapsed);
+    $("torText").textContent = `TAKE OVER within ${left.toFixed(1)} s — ${r.urgent ? "roadworks" : "exit"} ahead`;
+    if (!r.escalated && elapsed > r.escalateAfter) escalate();
+    if (left <= 0) minimalRiskStop();
+  }
+
+  if (state.phase === "manual") {
+    const steer = (state.keys.ArrowLeft ? -1 : 0) + (state.keys.ArrowRight ? 1 : 0);
+    state.vx += steer * 120 * dt;
+    state.vx *= Math.pow(0.25, dt); // damping
+    state.x += state.vx * dt;
+    state.x = Math.max(ROAD_L + 15, Math.min(ROAD_L + LANE_W * LANES - 15, state.x));
+    const since = state.t - r.takeoverAt;
+    if (since >= MEASURE_FROM && since <= MEASURE_TO) {
+      const nearest = Math.round((state.x - ROAD_L - LANE_W / 2) / LANE_W);
+      r.samples.push(state.x - laneCentre(Math.max(0, Math.min(2, nearest)))); // offset from nearest lane centre, px
+    }
+  }
+
+  if (state.phase === "mrm") {
+    // simulated minimal-risk manoeuvre: move to the hard shoulder and brake to a stop over ~3 s
+    state.x += (ROAD_L + LANE_W * LANES + 28 - state.x) * Math.min(1, 2.5 * dt);
+    state.speed = Math.max(0, state.speed - dt / 3);
+  }
+
+  // Hazard reaches the car: record outcome
+  if (state.hazard && !state.hazard.done && state.hazard.y >= EGO_Y - 20) {
+    state.hazard.done = true;
+    if (state.phase === "manual") {
+      const lane = Math.max(0, Math.min(2, Math.floor((state.x - ROAD_L) / LANE_W)));
+      if (r.urgent) r.outcome = lane === 1 ? "Entered roadworks lane" : "Avoided roadworks";
+      else r.outcome = lane === 0 ? "Took the exit" : "Missed the exit";
+    }
+  }
+  if (state.phase === "manual" && state.hazard && state.hazard.done && state.t - r.takeoverAt > MEASURE_TO) finishEpisode();
+  if (state.phase === "mrm" && state.speed === 0) { state.phase = "done-wait"; finishEpisode(); }
+  if (state.hazard && state.hazard.y > cv.height + 100) state.hazard.gone = true;
+
+  const st = $("status");
+  if (state.phase === "auto") st.textContent = "Automation ON — car is driving.";
+  else if (state.phase === "request") st.textContent = "Takeover requested — press Space or an arrow key.";
+  else if (state.phase === "manual") st.textContent = `Manual control — ${(state.t - r.takeoverAt).toFixed(1)} s since takeover.`;
+  else if (state.phase === "mrm") st.textContent = state.speed > 0 ? "No response — moving to hard shoulder and braking (simulated)." : "Stopped on hard shoulder.";
+  else st.textContent = "Episode logged. Automation resumes shortly.";
+}
+
+function draw() {
+  ctx.fillStyle = "#2f6b3a"; ctx.fillRect(0, 0, cv.width, cv.height);
+  ctx.fillStyle = "#3a3f47"; ctx.fillRect(ROAD_L, 0, LANE_W * LANES, cv.height);
+  ctx.fillStyle = "#55595f"; ctx.fillRect(ROAD_L + LANE_W * LANES + 3, 0, 52, cv.height); // hard shoulder
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(ROAD_L - 3, 0, 3, cv.height); ctx.fillRect(ROAD_L + LANE_W * LANES, 0, 3, cv.height);
+  for (let l = 1; l < LANES; l++) {
+    for (let y = -40 + state.scroll; y < cv.height; y += 40) ctx.fillRect(ROAD_L + LANE_W * l - 1, y, 3, 20);
+  }
+  const h = state.hazard;
+  if (h && h.y > -60) {
+    if (h.type === "cones") {
+      ctx.fillStyle = "#ff8f00";
+      for (let i = 0; i < 5; i++) { cone(laneCentre(1) - 30 + i * 15, h.y + i * 6); }
+      ctx.fillStyle = "#fff"; ctx.font = "bold 12px system-ui"; ctx.fillText("ROADWORKS", laneCentre(1) - 34, h.y - 14);
+    } else {
+      ctx.fillStyle = "#1b5e20"; ctx.fillRect(ROAD_L - 55, h.y - 18, 52, 30);
+      ctx.fillStyle = "#fff"; ctx.font = "bold 12px system-ui"; ctx.fillText("EXIT ←", ROAD_L - 52, h.y + 2);
+      ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillRect(ROAD_L, h.y - 18, LANE_W, 30);
+    }
+  }
+  // ego car
+  ctx.fillStyle = state.phase === "manual" ? "#1e88e5" : "#e0e0e0";
+  roundRect(state.x - 16, EGO_Y - 28, 32, 56, 7); ctx.fill();
+  ctx.fillStyle = "#222"; ctx.fillRect(state.x - 11, EGO_Y - 18, 22, 12);
+  ctx.fillStyle = "#fff"; ctx.font = "11px system-ui";
+  ctx.fillText(state.phase === "manual" ? "MANUAL" : "AUTO", state.x - 17, EGO_Y + 42);
+}
+function cone(x, y) { ctx.beginPath(); ctx.moveTo(x, y - 9); ctx.lineTo(x - 6, y + 7); ctx.lineTo(x + 6, y + 7); ctx.closePath(); ctx.fill(); }
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+
+// ---------- UI ----------
+function renderReasoning() {
+  const r = state.req;
+  const p = r || planRequest(true);
+  const rows = [
+    ["Mode", state.mode === "fixed" ? "Fixed baseline" : "Adaptive"],
+    ["Driver is", label(state.activity)],
+    ["Sensor says", label(sensedActivity()) + (state.fault ? " (error)" : "")],
+    ["Readiness", p.readiness],
+    ["Lead time", p.lead + " s" + (r ? "" : " (urgent)")],
+    ["Cues", modsText(p.mods)],
+    ["Escalate after", p.escalateAfter + " s without response"],
+    ["Takeovers so far", state.history.length ? state.history.map(t => t.toFixed(1)).join(", ") + " s" : "none"],
+    ["Why", p.why]
+  ];
+  $("reasoning").innerHTML = rows.map(([k, v]) => `<b>${k}</b><span>${v}</span>`).join("");
+}
+
+function renderLog() {
+  $("log").innerHTML = state.log.map((r, i) => {
+    const tt = r.takeoverAt != null ? (r.takeoverAt - r.start).toFixed(2) + " s" : "—";
+    const rms = r.rms != null ? (r.rms / PX_PER_M).toFixed(2) + " m" : "—";
+    const ok = /Avoided|Took/.test(r.outcome || "");
+    return `<tr><td>${i + 1}</td><td>${r.mode}</td><td>${r.urgent ? "urgent" : "non-urgent"}</td><td>${label(r.actual)}</td>
+      <td>${label(r.sensed)}</td><td>${r.lead} s</td><td>${modsText(r.mods)}</td><td>${r.escalated ? "yes" : "no"}</td>
+      <td>${tt}</td><td>${rms}</td><td class="${ok ? "good" : "bad"}">${r.outcome || "—"}</td></tr>`;
+  }).join("");
+}
+
+function downloadCSV() {
+  const head = "n,mode,scenario,actual,sensed,lead_s,modalities,escalated,takeover_s,lane_rms_m,outcome";
+  const rows = state.log.map((r, i) => [i + 1, r.mode, r.urgent ? "urgent" : "non-urgent", r.actual, r.sensed, r.lead,
+    r.mods.join("+"), r.escalated, r.takeoverAt != null ? (r.takeoverAt - r.start).toFixed(2) : "",
+    r.rms != null ? (r.rms / PX_PER_M).toFixed(3) : "", `"${r.outcome}"`].join(","));
+  const blob = new Blob([[head, ...rows].join("\n")], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "takeover_log.csv"; a.click();
+}
+
+function setMode(m) {
+  state.mode = m;
+  $("modeFixed").classList.toggle("on", m === "fixed");
+  $("modeAdaptive").classList.toggle("on", m === "adaptive");
+  renderReasoning();
+}
+$("modeFixed").onclick = () => setMode("fixed");
+$("modeAdaptive").onclick = () => setMode("adaptive");
+document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+  state.activity = b.dataset.act;
+  document.querySelectorAll("[data-act]").forEach(x => x.classList.toggle("on", x === b));
+  if (state.phase === "auto") resetScreen();
+  renderReasoning();
+});
+$("fault").onchange = e => { state.fault = e.target.checked; renderReasoning(); };
+$("urgent").onclick = () => startRequest(true);
+$("nonurgent").onclick = () => startRequest(false);
+$("csv").onclick = downloadCSV;
+
+window.addEventListener("keydown", e => {
+  if (["Space", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.code)) {
+    e.preventDefault();
+    if (state.phase === "request") takeover();
+  }
+  state.keys[e.code] = true;
+});
+window.addEventListener("keyup", e => { state.keys[e.code] = false; });
+
+// test hook used by the screenshot script
+window.sim = { state, startRequest, takeover, setMode };
+
+resetScreen(); renderReasoning(); requestAnimationFrame(frame);
+</script>
+</body>
+</html>

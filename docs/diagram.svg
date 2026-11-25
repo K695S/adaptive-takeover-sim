@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1370" height="900" font-family="DejaVu Sans, sans-serif">
+<defs><marker id="a" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#333"/></marker>
+<marker id="ar" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#c62828"/></marker></defs>
+<rect width="1370" height="900" fill="white"/>
+<text x="40" y="34" font-size="20" font-weight="bold" fill="#111">System diagram — adaptive takeover request prototype</text>
+<rect x="40" y="52" width="210" height="26" rx="4" fill="#f2f4f7"/><text x="145.0" y="70" font-size="12" font-weight="bold" text-anchor="middle" fill="#555">1. SENSING</text>
+<rect x="310" y="52" width="210" height="26" rx="4" fill="#f2f4f7"/><text x="415.0" y="70" font-size="12" font-weight="bold" text-anchor="middle" fill="#555">2. INFERENCE</text>
+<rect x="580" y="52" width="210" height="26" rx="4" fill="#f2f4f7"/><text x="685.0" y="70" font-size="12" font-weight="bold" text-anchor="middle" fill="#555">3. PLANNING</text>
+<rect x="850" y="52" width="210" height="26" rx="4" fill="#f2f4f7"/><text x="955.0" y="70" font-size="12" font-weight="bold" text-anchor="middle" fill="#555">4. OUTPUTS (CUES)</text>
+<rect x="1120" y="52" width="210" height="26" rx="4" fill="#f2f4f7"/><text x="1225.0" y="70" font-size="12" font-weight="bold" text-anchor="middle" fill="#555">5. DRIVER &amp; VEHICLE</text>
+<rect x="40" y="110" width="210" height="90" rx="8" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/>
+<text x="244" y="123" font-size="9" font-weight="bold" text-anchor="end" fill="#c56a00">SIMULATED</text>
+<text x="145.0" y="140" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Driver activity sensor</text>
+<text x="145.0" y="157" font-size="12" text-anchor="middle" fill="#333">buttons + sensor-error toggle</text>
+<text x="145.0" y="192" font-size="11" font-style="italic" text-anchor="middle" fill="#777">planned: camera + classifier</text>
+<rect x="40" y="225" width="210" height="90" rx="8" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/>
+<text x="244" y="238" font-size="9" font-weight="bold" text-anchor="end" fill="#c56a00">SIMULATED</text>
+<text x="145.0" y="255" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Hazard scenario</text>
+<text x="145.0" y="272" font-size="12" text-anchor="middle" fill="#333">roadworks (urgent) /</text>
+<text x="145.0" y="287" font-size="12" text-anchor="middle" fill="#333">exit (non-urgent)</text>
+<text x="145.0" y="307" font-size="11" font-style="italic" text-anchor="middle" fill="#777">planned: vehicle perception</text>
+<rect x="310" y="110" width="210" height="90" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="514" y="123" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="415.0" y="140" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Readiness estimator</text>
+<text x="415.0" y="157" font-size="12" text-anchor="middle" fill="#333">rules: activity →</text>
+<text x="415.0" y="172" font-size="12" text-anchor="middle" fill="#333">High / Medium / Low</text>
+<text x="415.0" y="192" font-size="11" font-style="italic" text-anchor="middle" fill="#777">planned: learned model</text>
+<rect x="310" y="370" width="210" height="80" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="514" y="383" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="415.0" y="400" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Driver profile</text>
+<text x="415.0" y="417" font-size="12" text-anchor="middle" fill="#333">past takeover times →</text>
+<text x="415.0" y="432" font-size="12" text-anchor="middle" fill="#333">+0–2 s adjustment</text>
+<rect x="580" y="100" width="210" height="240" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="784" y="113" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="685.0" y="130" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Request planner</text>
+<text x="685.0" y="147" font-size="12" text-anchor="middle" fill="#333">fixed or adaptive mode</text>
+<text x="685.0" y="162" font-size="12" text-anchor="middle" fill="#333"></text>
+<text x="685.0" y="177" font-size="12" text-anchor="middle" fill="#333">chooses:</text>
+<text x="685.0" y="192" font-size="12" text-anchor="middle" fill="#333">• lead time</text>
+<text x="685.0" y="207" font-size="12" text-anchor="middle" fill="#333">• cues (modalities)</text>
+<text x="685.0" y="222" font-size="12" text-anchor="middle" fill="#333">• pause in-car screen</text>
+<text x="685.0" y="237" font-size="12" text-anchor="middle" fill="#333">• escalation time</text>
+<text x="685.0" y="252" font-size="12" text-anchor="middle" fill="#333"></text>
+<text x="685.0" y="267" font-size="12" text-anchor="middle" fill="#333">structured plan →</text>
+<rect x="580" y="430" width="210" height="90" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="784" y="443" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="685.0" y="460" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Escalation monitor</text>
+<text x="685.0" y="477" font-size="12" text-anchor="middle" fill="#333">no hands-on in 2 s → escalate</text>
+<text x="685.0" y="492" font-size="12" text-anchor="middle" fill="#333">time budget expired → stop</text>
+<rect x="850" y="100" width="210" height="50" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="1054" y="113" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="955.0" y="130.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Banner + countdown</text>
+<rect x="850" y="162" width="210" height="50" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="1054" y="175" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="955.0" y="192.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Chime + spoken prompt</text>
+<rect x="850" y="224" width="210" height="50" rx="8" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/>
+<text x="1054" y="237" font-size="9" font-weight="bold" text-anchor="end" fill="#c56a00">SIMULATED</text>
+<text x="955.0" y="254.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Seat vibration</text>
+<rect x="850" y="286" width="210" height="50" rx="8" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/>
+<text x="1054" y="299" font-size="9" font-weight="bold" text-anchor="end" fill="#c56a00">SIMULATED</text>
+<text x="955.0" y="316.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Pause in-car screen</text>
+<rect x="850" y="348" width="210" height="50" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="1054" y="361" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="955.0" y="378.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Planner reasoning panel</text>
+<rect x="850" y="450" width="210" height="50" rx="8" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/>
+<text x="1054" y="463" font-size="9" font-weight="bold" text-anchor="end" fill="#c56a00">SIMULATED</text>
+<text x="955.0" y="480.0" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Minimal-risk stop</text>
+<rect x="1120" y="100" width="210" height="236" rx="8" fill="#e3ecfb" stroke="#2457c5" stroke-width="2"/>
+<text x="1324" y="113" font-size="9" font-weight="bold" text-anchor="end" fill="#2457c5">HUMAN</text>
+<text x="1225.0" y="130" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">DRIVER</text>
+<text x="1225.0" y="147" font-size="12" text-anchor="middle" fill="#333">sees / hears / feels cues</text>
+<text x="1225.0" y="162" font-size="12" text-anchor="middle" fill="#333"></text>
+<text x="1225.0" y="177" font-size="12" text-anchor="middle" fill="#333">plays the driver in tests:</text>
+<text x="1225.0" y="192" font-size="12" text-anchor="middle" fill="#333">chooses activity, takes over,</text>
+<text x="1225.0" y="207" font-size="12" text-anchor="middle" fill="#333">steers</text>
+<rect x="1120" y="560" width="210" height="60" rx="8" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/>
+<text x="1324" y="573" font-size="9" font-weight="bold" text-anchor="end" fill="#c56a00">SIMULATED</text>
+<text x="1225.0" y="590" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Takeover input</text>
+<text x="1225.0" y="607" font-size="12" text-anchor="middle" fill="#333">Space / arrow keys (wheel)</text>
+<rect x="1120" y="660" width="210" height="60" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="1324" y="673" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="1225.0" y="690" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Manual vehicle model</text>
+<text x="1225.0" y="707" font-size="12" text-anchor="middle" fill="#333">steering, lane position</text>
+<rect x="1120" y="760" width="210" height="70" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+<text x="1324" y="773" font-size="9" font-weight="bold" text-anchor="end" fill="#2e7d32">IMPLEMENTED</text>
+<text x="1225.0" y="790" font-size="14" font-weight="bold" text-anchor="middle" fill="#111">Takeover logger</text>
+<text x="1225.0" y="807" font-size="12" text-anchor="middle" fill="#333">time · lane deviation (m) ·</text>
+<text x="1225.0" y="822" font-size="12" text-anchor="middle" fill="#333">outcome → table + CSV</text>
+<polyline points="250,155.0 310,155.0" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="282" y="172" font-size="12" fill="#333" text-anchor="middle">sensed</text>
+<polyline points="250,262 580,262" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="440" y="256" font-size="12" fill="#333" text-anchor="middle">urgency + time budget</text>
+<polyline points="520,155.0 580,155" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="550" y="172" font-size="12" fill="#333" text-anchor="middle">readiness</text>
+<polyline points="415.0,370 415.0,315 580,315" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="430" y="309" font-size="12" fill="#333" text-anchor="start">+ adjustment</text>
+<polyline points="640,340 640,430" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="634" y="392" font-size="12" fill="#333" text-anchor="end">start timer</text>
+<polyline points="730,430 730,340" fill="none" stroke="#c62828" stroke-width="2" marker-end="url(#ar)"/>
+<text x="736" y="392" font-size="12" fill="#c62828" text-anchor="start">escalate</text>
+<polyline points="790,224 818,224" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="818,125 818,373" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="818,125.0 850,125.0" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="818,187.0 850,187.0" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="818,249.0 850,249.0" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="818,311.0 850,311.0" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<polyline points="818,373.0 850,373.0" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="796" y="94" font-size="12" fill="#333">request plan</text>
+<polyline points="790,475 850,475" fill="none" stroke="#c62828" stroke-width="2" marker-end="url(#ar)"/>
+<text x="820" y="468" font-size="12" fill="#c62828" text-anchor="middle">timeout</text>
+<polyline points="1060,125.0 1090,125.0" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="1060,187.0 1090,187.0" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="1060,249.0 1090,249.0" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="1060,311.0 1090,311.0" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="1090,125 1090,311" fill="none" stroke="#333" stroke-width="2"/>
+<polyline points="1090,218 1120,218" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="1094" y="94" font-size="12" fill="#333">cues</text>
+<polyline points="1225,336 1225,560" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="1231" y="450" font-size="12" fill="#333" text-anchor="start">hands on / steer</text>
+<polyline points="1225.0,620 1225.0,660" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="1240" y="645" font-size="12" fill="#333" text-anchor="start">control</text>
+<polyline points="1225.0,720 1225.0,760" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="1240" y="745" font-size="12" fill="#333" text-anchor="start">lane position</text>
+<polyline points="1120,590.0 685,590 685,520" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="700" y="583" font-size="12" fill="#333" text-anchor="start">hands-on detected → stop cues, start measuring</text>
+<polyline points="1120,795.0 415,795 415,450" fill="none" stroke="#333" stroke-width="2" marker-end="url(#a)"/>
+<text x="430" y="788" font-size="12" fill="#333" text-anchor="start">takeover time (feedback loop: personal adjustment)</text>
+<rect x="40" y="852" width="22" height="16" rx="3" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/><text x="70" y="865" font-size="12" fill="#333">Implemented (working code)</text>
+<rect x="300" y="852" width="22" height="16" rx="3" fill="#fff3e0" stroke="#c56a00" stroke-width="2"/><text x="330" y="865" font-size="12" fill="#333">Simulated (on-screen stand-in)</text>
+<rect x="560" y="852" width="22" height="16" rx="3" fill="#e3ecfb" stroke="#2457c5" stroke-width="2"/><text x="590" y="865" font-size="12" fill="#333">Human</text>
+<text x="820" y="865" font-size="12" font-style="italic" fill="#777">grey italic = planned replacement</text>
+<line x1="1050" y1="861" x2="1090" y2="861" stroke="#c62828" stroke-width="2"/><text x="1098" y="865" font-size="12" fill="#333">escalation / safety path</text>
+</svg>
