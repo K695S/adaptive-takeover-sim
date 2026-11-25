@@ -62,7 +62,7 @@ The repository holds the final version (v3), uploaded in one commit; the stages 
 - **Developing the system:** I set the design from my A1 sources (adaptive vs fixed requests, sensor error, escalation, logging). Claude wrote the code for each version and proposed fixes found during testing (steps 4, 5 and 8). I reviewed each change against my rationale table and A1 evidence before keeping it.
 - **My own design decision (v3):** After reviewing the prototype with Claude, I decided the spoken prompt should say which lane is closed and which way to move, because Politis et al. (2015) found language-based warnings help drivers understand the situation. I tested it in the urgent film scenario.
 - **Diagrams and storyboards:** Claude drew the system diagram and captured and laid out the storyboard screenshots. I checked that each implemented/simulated/planned label matches the code and each caption matches its screenshot.
-- **Report and README:** The report is my own writing, based on my A1 and my design decisions. Claude gave me a first draft, which I completely rewrote in my own words, and then proofread my final text for grammar and accuracy. Claude also drafted this README, which I reviewed. I checked every reference against my A1 reading list.
+- **Report and README:** The report is my own writing, based on my A1 and my design decisions. Claude gave me a first draft, and then proofread my final text for grammar and accuracy. Claude also drafted this README, which I reviewed. I checked every reference against my A1 reading list.
 
 ## Additional files
 
